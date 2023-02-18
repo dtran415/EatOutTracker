@@ -44,7 +44,7 @@ class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     yelp_id = db.Column(db.Text)
-    img_url = db.Column(db.Text, db.ForeignKey('restaurants.id'), nullable=False)
+    img_url = db.Column(db.Text)
 
 class Entry(db.Model):
     __tablename__ = "entries"

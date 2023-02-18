@@ -1,5 +1,9 @@
 import datetime
 import calendar
+from models import Restaurant, Entry
+import requests
+from dotenv import load_dotenv
+import os
 
 # return None if invalid year month
 def generateCalendarHTML(db, year=None, month=None):
@@ -52,3 +56,60 @@ def generateCalendarHTML(db, year=None, month=None):
         html += '</div>'
     html += '</div>'
     return html
+
+def get_restaurant(db, name, yelp_id):
+    restaurant = None
+    # find restaurant by yelp_id
+    if yelp_id:
+        restaurant = Restaurant.query.filter_by(yelp_id=yelp_id).first()
+        
+        if restaurant and name != restaurant.name:
+            # update the name in case it's different, for display purposes
+            restaurant.name = name
+            db.session.commit()
+    
+    # if restaurant not found and yelp_id not supplied, try finding by name
+    if not restaurant and not yelp_id:
+        restaurant = Restaurant.query.filter_by(name=name).first()
+        
+    # if still not found create a new restaurant
+    if not restaurant:
+        restaurant = register_restaurant(db, name=name, yelp_id=yelp_id)
+    
+    return restaurant
+
+def register_restaurant(db, name, yelp_id):
+    
+    yelp_data = fetch_restaurant_from_yelp(yelp_id)
+    
+    yelp_id = yelp_data.get('id', None)
+    img_url = yelp_data.get('image_url', None)
+        
+    restaurant = Restaurant(name=name, yelp_id=yelp_id, img_url=img_url)
+    db.session.add(restaurant)
+    db.session.commit()
+    
+    return restaurant
+        
+def fetch_restaurant_from_yelp(yelp_id):
+    load_dotenv()
+    YELP_API_KEY = os.getenv('YELP_API_KEY')
+    
+    if not YELP_API_KEY:
+        raise Exception('Missing API Key')
+
+    url = f"https://api.yelp.com/v3/businesses/{yelp_id}"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {YELP_API_KEY}"
+    }
+
+    response = requests.get(url, headers=headers)
+    
+    if response.json().get('id', None):
+        return response.json()
+    else:
+        if response.json().get('code') == 'Validation_ERROR':
+            raise Exception('Bad API Key')
+        raise Exception('Invalid Yelp ID')
