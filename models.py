@@ -55,6 +55,7 @@ class Entry(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
     amount = db.Column(db.Float)
     
+    restaurant = db.relationship('Restaurant')
     tags = db.relationship('Tag', secondary='tags_entries')
     
 class Tag(db.Model):

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 
 # return None if invalid year month
-def generateCalendarHTML(db, year=None, month=None):
+def generateCalendarHTML(db, user_id, year=None, month=None):
     start = None
     try:
         if year != None and month != None:
@@ -18,8 +18,9 @@ def generateCalendarHTML(db, year=None, month=None):
     
     # add 32 days from the 1st and then replace day to 1 to get the 1st of next month
     end = (start + datetime.timedelta(days=32)).replace(day=1)
-    print(start)
-    print(end)
+    
+    entries = get_entries_for_user(db, user_id, start, end)
+    
     html = f"""<div class="container text-center">
 	<h1>{calendar.month_name[start.month]} {start.year}</h1>
 	<div class="grid-calendar">
@@ -42,20 +43,34 @@ def generateCalendarHTML(db, year=None, month=None):
                     found = True
             dayNumber = ''
                 
-            html += f'<div class="col grid-cell border"><div>'
+            html += f'<div class="col grid-cell border">'
             # start adding stuff when a day of the month is found
             if found:
                 # only add day if within that month. Not adding days from previous and next month
                 if start < end:
                     dayNumber = start.day
                     html += f"<div>{dayNumber}</div>"
+                    entries_list = entries.get(start, [])
+                    for entry in entries_list:
+                        html += f'<a href="/entries/{entry.id}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br><span class="badge bg-success">${round(entry.amount, 2):.2f}</span></a>'
                     
-                    # TODO Add events to day
                 start = start + datetime.timedelta(days=1)
-            html += "</div></div>"
+            html += "</div>"
         html += '</div>'
     html += '</div>'
     return html
+
+# returns dict for easy reference when adding to calendar
+def get_entries_for_user(db, user_id, startdate, enddate):
+    entries = Entry.query.filter(Entry.user_id==user_id, Entry.date.between(startdate, enddate)).all()
+    entries_dict = {}
+    
+    for entry in entries:
+        if not entries_dict.get(entry.date):
+            entries_dict[entry.date] = []
+        entries_dict[entry.date].append(entry)
+    
+    return entries_dict
 
 def get_restaurant(db, name, yelp_id):
     restaurant = None
@@ -80,12 +95,16 @@ def get_restaurant(db, name, yelp_id):
 
 def register_restaurant(db, name, yelp_id):
     
-    yelp_data = fetch_restaurant_from_yelp(yelp_id)
-    
-    yelp_id = yelp_data.get('id', None)
-    img_url = yelp_data.get('image_url', None)
+    restaurant = Restaurant(name=name)
+    if yelp_id:
+        yelp_data = fetch_restaurant_from_yelp(yelp_id)
         
-    restaurant = Restaurant(name=name, yelp_id=yelp_id, img_url=img_url)
+        yelp_id = yelp_data.get('id', None)
+        img_url = yelp_data.get('image_url', None)
+            
+        restaurant.yelp_id = yelp_id
+        restaurant.img_url = img_url
+        
     db.session.add(restaurant)
     db.session.commit()
     

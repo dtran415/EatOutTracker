@@ -24,6 +24,9 @@
             <p>
                 {{form.yelp_id.label}} <button type='button' class='btn btn-sm btn-danger m-2' id='search-yelp'>Search Yelp</button>
                 {{form.yelp_id(class_="form-control")}}
+                {% for error in form.yelp_id.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
             </p>
         </div>
         <button type="submit" class="btn btn-primary">Add Entry</button>
