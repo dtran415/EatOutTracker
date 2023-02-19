@@ -4,6 +4,7 @@ from models import Restaurant, Entry
 import requests
 from dotenv import load_dotenv
 import os
+from flask import jsonify, url_for
 
 # return None if invalid year month
 def generateCalendarHTML(db, user_id, year=None, month=None):
@@ -18,11 +19,13 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
     
     # add 32 days from the 1st and then replace day to 1 to get the 1st of next month
     end = (start + datetime.timedelta(days=32)).replace(day=1)
-    
+    previousMonth = start - datetime.timedelta(days=1)
+    # end is already next month
+    nextMonth = end
     entries = get_entries_for_user(db, user_id, start, end)
     
     html = f"""<div class="container text-center">
-	<h1>{calendar.month_name[start.month]} {start.year}</h1>
+	<h1><a class='float-start text-decoration-none text-dark' href='?year={previousMonth.year}&month={previousMonth.month}'>&lt;</a>{calendar.month_name[start.month]} {start.year}<a class='float-end text-decoration-none text-dark' href='?year={nextMonth.year}&month={nextMonth.month}'>&gt;</a></h1>
 	<div class="grid-calendar">
 		<div class="row calendar-week-header">
 			<div class="col grid-cell border"><div><div><span>Sunday</span></div></div></div>
@@ -49,10 +52,10 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
                 # only add day if within that month. Not adding days from previous and next month
                 if start < end:
                     dayNumber = start.day
-                    html += f"<div>{dayNumber}</div>"
+                    html += f"<div class='text-start'>{dayNumber} <a class='btn btn-success btn-sm float-end py-0 px-1' href='{url_for('calendar.add_entry_page', date=start.strftime('%Y-%m-%d'))}'>+</a></div>"
                     entries_list = entries.get(start, [])
                     for entry in entries_list:
-                        html += f'<a href="/entries/{entry.id}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br><span class="badge bg-success">${round(entry.amount, 2):.2f}</span></a>'
+                        html += f'<a href="{url_for("calendar.show_entry", entry_id=entry.id)}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br><span class="badge bg-success">${round(entry.amount, 2):.2f}</span></a>'
                     
                 start = start + datetime.timedelta(days=1)
             html += "</div>"
@@ -132,3 +135,36 @@ def fetch_restaurant_from_yelp(yelp_id):
         if response.json().get('code') == 'Validation_ERROR':
             raise Exception('Bad API Key')
         raise Exception('Invalid Yelp ID')
+    
+def search_yelp(term, location):
+    load_dotenv()
+    YELP_API_KEY = os.getenv('YELP_API_KEY')
+    
+    if not YELP_API_KEY:
+        raise Exception('Missing API Key')
+
+    url = f"https://api.yelp.com/v3/businesses/search?location={location}&term={term}&sort_by=best_match&limit=20"
+
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {YELP_API_KEY}"
+    }
+
+    response = requests.get(url, headers=headers)
+    if not response.json().get('businesses', None):
+        if response.json().get('code') == 'Validation_ERROR':
+            raise Exception('Bad API Key')
+        raise Exception('Invalid Yelp ID')
+    
+    results = []
+    businesses = response.json().get("businesses")
+    for business in businesses:
+        displayAddress = "<br>".join(business.get("location").get("display_address"))
+        results.append({
+            "id":business.get("id"),
+            "name":business.get("name"),
+            "address":displayAddress
+        })
+    
+    return jsonify(results)

@@ -16,3 +16,9 @@ class AddEntryForm(FlaskForm):
     amount = DecimalField('Amount', render_kw={'placeholder':'Amount'})
     name = StringField('Restaurant Name', validators=[DataRequired()], render_kw={'placeholder':'Restaurant Name'})
     yelp_id = StringField('Yelp ID', render_kw={'placeholder':'Yelp ID'})
+    
+class EditEntryForm(FlaskForm):
+    date = DateField('Date', validators=[DataRequired()])
+    amount = DecimalField('Amount', render_kw={'placeholder':'Amount'})
+    name = StringField('Restaurant Name', validators=[DataRequired()], render_kw={'placeholder':'Restaurant Name'})
+    yelp_id = StringField('Yelp ID', render_kw={'placeholder':'Yelp ID'})

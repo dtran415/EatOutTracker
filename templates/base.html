@@ -22,21 +22,21 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     {% if not current_user.is_authenticated%}
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="/login">Login</a>
+                        <a class="nav-link text-light" href="{{url_for('auth.login_page')}}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="/signup">Sign Up</a>
+                        <a class="nav-link text-light" href="{{url_for('auth.signup_page')}}">Sign Up</a>
                     </li>
                     {% endif %}
                     {% if current_user.is_authenticated%}
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="/calendar">Calendar</a>
+                        <a class="nav-link text-light" href="{{url_for('calendar.calendar_page')}}">Calendar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="/entries">Add Entry</a>
+                        <a class="nav-link text-light" href="{{url_for('calendar.add_entry_page')}}">Add Entry</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="/logout">Log Out</a>
+                        <a class="nav-link text-light" href="{{url_for('auth.logout')}}">Log Out</a>
                     </li>
                     {% endif %}
                 </ul>

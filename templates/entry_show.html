@@ -7,7 +7,12 @@
             <img src={{restaurant.get('img_url') or missing_image}} class='img-fluid'/>
         </div>
         <div class="col col-md-6">
-            <h1>{{restaurant.get('name')}}</h1>
+            <h1>{{restaurant.get('name')}} 
+                <a class="btn btn-primary" href="{{url_for('calendar.edit_entry_page', entry_id=entry.id)}}">Edit</a>
+                <form class="d-inline" method="POST" action="{{url_for('calendar.delete_entry', entry_id=entry.id)}}" id="delete-btn">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+            </h1>
             {% if restaurant.get('display_address') %}
             <p>Address: <br>
                 {% for line in restaurant.get('display_address')%}
@@ -20,4 +25,10 @@
         </div>
     </div>
 </div>
+<script
+  src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
+  integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo="
+  crossorigin="anonymous"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<script src="/static/entry.js"></script>
 {% endblock %}
