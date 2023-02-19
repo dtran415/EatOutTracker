@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, abort, redirect, url_for
 from models import db, Entry
 from flask_login import login_required, current_user
-from eot_calendar.helpers import generateCalendarHTML, get_restaurant, fetch_restaurant_from_yelp, search_yelp
+from eot_calendar.helpers import generateCalendarHTML, get_restaurant, fetch_restaurant_from_yelp, search_yelp, get_star_ratings_html
 from forms import AddEntryForm, EditEntryForm
 from datetime import datetime
 
@@ -62,14 +62,20 @@ def add_entry():
 def show_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
     restaurant = {'name':entry.restaurant.name}
+    ratingsHTML = None
     
     yelp_id = entry.restaurant.yelp_id
     if yelp_id:
         response = fetch_restaurant_from_yelp(entry.restaurant.yelp_id)
         restaurant['img_url'] = response.get('image_url')
         restaurant['display_address'] = response.get('location').get('display_address')
+        restaurant['phone'] = response.get('display_phone')
+        restaurant['ratings'] = response.get('rating')
+        restaurant['review_count'] = response.get('review_count')
+        restaurant['url'] = response.get('url')
+        ratingsHTML = get_star_ratings_html(restaurant['ratings'])
     
-    return render_template('entry_show.html', current_user=current_user, restaurant=restaurant, entry=entry)
+    return render_template('entry_show.html', current_user=current_user, restaurant=restaurant, entry=entry, ratingsHTML=ratingsHTML)
 
 @calendar.route('/entries/<int:entry_id>/edit')
 @login_required
@@ -101,8 +107,8 @@ def edit_entry(entry_id):
         entry.yelp_id = form.yelp_id.data
         
         try:
-            get_restaurant(db, entry.name, entry.yelp_id)
-            # if no problem getting restaurant commit changes
+            restaurant = get_restaurant(db, entry.name, entry.yelp_id)
+            entry.restaurant_id = restaurant.id
             db.session.commit()
             return redirect(url_for('calendar.show_entry', entry_id=entry.id))
         except Exception as e:

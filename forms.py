@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, DateField, DecimalField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()], render_kw={'placeholder':'Username'})
@@ -13,7 +13,7 @@ class SignUpForm(FlaskForm):
     
 class AddEntryForm(FlaskForm):
     date = DateField('Date', validators=[DataRequired()])
-    amount = DecimalField('Amount', render_kw={'placeholder':'Amount'})
+    amount = DecimalField('Amount', validators=[Optional()], render_kw={'placeholder':'Amount'})
     name = StringField('Restaurant Name', validators=[DataRequired()], render_kw={'placeholder':'Restaurant Name'})
     yelp_id = StringField('Yelp ID', render_kw={'placeholder':'Yelp ID'})
     

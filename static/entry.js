@@ -13,8 +13,11 @@ function deleteEntry(e) {
 
 function selectBusiness(e) {
     $('#search-yelp-modal').modal('hide')
-    const yelp_id = e.target.closest('.result').dataset.yelp_id
+    const selected = e.target.closest('.result')
+    const yelp_id = selected.dataset.yelp_id
+    const yelp_name = selected.dataset.yelp_name
     $('#yelp_id').val(yelp_id)
+    $('#name').val(yelp_name)
 }
 
 async function searchYelp(e) {
@@ -28,13 +31,16 @@ async function searchYelp(e) {
         error = err.response.data
     }
     
+    if (!error && response.data.length == 0)
+        error = "No results found"
+
     $('#spinner').hide()
     $('#results').show()
     if (error) {
         $('#results').append($('<span>', {text: error}))
     } else {
         for (business of response.data) {
-            $('<div>', {class:'my-1 btn btn-outline-success d-block text-start result'}).attr('data-yelp_id', business.id).append([
+            $('<div>', {class:'my-1 btn btn-outline-success d-block text-start result'}).attr({'data-yelp_id': business.id, 'data-yelp_name':business.name}).append([
                     $('<p>', {class:'fw-bold', text:business.name}),
                     $('<p>', {html:business.address})
                 ]).appendTo($('#results'))

@@ -55,7 +55,10 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
                     html += f"<div class='text-start'>{dayNumber} <a class='btn btn-success btn-sm float-end py-0 px-1' href='{url_for('calendar.add_entry_page', date=start.strftime('%Y-%m-%d'))}'>+</a></div>"
                     entries_list = entries.get(start, [])
                     for entry in entries_list:
-                        html += f'<a href="{url_for("calendar.show_entry", entry_id=entry.id)}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br><span class="badge bg-success">${round(entry.amount, 2):.2f}</span></a>'
+                        html += f'<a href="{url_for("calendar.show_entry", entry_id=entry.id)}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br>'
+                        if entry.amount:
+                            html += f'<span class="badge bg-success">${round(entry.amount, 2):.2f}</span>'
+                        html += '</a>'
                     
                 start = start + datetime.timedelta(days=1)
             html += "</div>"
@@ -88,7 +91,7 @@ def get_restaurant(db, name, yelp_id):
     
     # if restaurant not found and yelp_id not supplied, try finding by name
     if not restaurant and not yelp_id:
-        restaurant = Restaurant.query.filter_by(name=name).first()
+        restaurant = Restaurant.query.filter_by(name=name, yelp_id=None).first()
         
     # if still not found create a new restaurant
     if not restaurant:
@@ -152,10 +155,8 @@ def search_yelp(term, location):
     }
 
     response = requests.get(url, headers=headers)
-    if not response.json().get('businesses', None):
-        if response.json().get('code') == 'Validation_ERROR':
-            raise Exception('Bad API Key')
-        raise Exception('Invalid Yelp ID')
+    if response.json().get('error'):
+        raise Exception(response.json().get('error').get('description'))
     
     results = []
     businesses = response.json().get("businesses")
@@ -168,3 +169,16 @@ def search_yelp(term, location):
         })
     
     return jsonify(results)
+
+def get_star_ratings_html(rating):
+    html = '<span>'
+    for i in range(5):
+        diff = rating - i
+        if diff >= 1:
+            html += '<i class="fa-solid fa-star"></i>'
+        elif diff >= 0:
+            html += '<i class="fa-solid fa-star-half-stroke"></i>'
+        else:
+            html += '<i class="fa-regular fa-star"></i>'
+    html += '</span>'
+    return html

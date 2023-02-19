@@ -7,21 +7,33 @@
             <img src={{restaurant.get('img_url') or missing_image}} class='img-fluid'/>
         </div>
         <div class="col col-md-6">
-            <h1>{{restaurant.get('name')}} 
-                <a class="btn btn-primary" href="{{url_for('calendar.edit_entry_page', entry_id=entry.id)}}">Edit</a>
+            {% if restaurant.get('url') %}
+                <a href='{{restaurant.get("url")}}' class="h1 d-inline text-decoration-none" target="_blank" rel="noopener noreferrer">{{restaurant.get('name')}}</a>
+            {% else %}
+                <div class="h1 d-inline">{{restaurant.get('name')}}</div>
+            {% endif %}
+            {% if ratingsHTML %}<span class="text-danger mb-1">{{ratingsHTML|safe}}</span><span class="mb-1"> {{restaurant.get('review_count', 0)}} reviews</span>{% endif %}</h1>
+            <div class="mb-2"><a class="btn btn-primary" href="{{url_for('calendar.edit_entry_page', entry_id=entry.id)}}">Edit</a>
                 <form class="d-inline" method="POST" action="{{url_for('calendar.delete_entry', entry_id=entry.id)}}" id="delete-btn">
                     <button class="btn btn-danger" type="submit">Delete</button>
-                </form>
-            </h1>
+                </form></div>
             {% if restaurant.get('display_address') %}
-            <p>Address: <br>
+            <p class="h5">
                 {% for line in restaurant.get('display_address')%}
                 {{line}}<br>
                 {% endfor %}
+                
+                {% if restaurant.get('phone')%}
+                {{restaurant.get('phone')}}
+                {% endif %}
             </p>
             {% endif %}
-            <p>Date: {{entry.date.strftime('%b %d, %Y')}}</p>
-            <p>Amount: ${{'%0.2f'|format(entry.amount)}}</p>
+            <div class="text-secondary">Date</div>
+            <p class="h5">{{entry.date.strftime('%b %d, %Y')}}</p>
+            {% if entry.amount %}
+            <div class="text-secondary">Amount</div>
+            <p class="h5">${{'%0.2f'|format(entry.amount)}}</p>
+            {% endif %}
         </div>
     </div>
 </div>
