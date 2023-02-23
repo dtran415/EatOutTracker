@@ -1,4 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ calendarHTML|safe }}
+<div class="row calendar-view">
+    <div class="fixed sidebar p-4 bg-light">
+        <form action="" method="GET">        
+            <p>
+                {{form.month.label}}
+                {{form.month(class_="form-select")}}
+            </p>
+        
+            <p>
+                {{form.year.label}}
+                {{form.year(class_="form-control")}}
+            </p>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+        <br>
+        <div class="text-secondary">Places Visited</div>
+        <p class="h5">{{numPlaces or 0}}</p>
+        <div class="text-secondary">Total Spent</div>
+        <p class="h5">${{'%0.2f'|format(totalSpent or 0)}}</p>
+    </div>
+    <div class="col p-5">
+        {{ calendarHTML|safe }}
+    </div>
+</div>
 {% endblock %}

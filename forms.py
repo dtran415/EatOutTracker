@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, DateField, DecimalField
+from wtforms import StringField, PasswordField, BooleanField, DateField, DecimalField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Optional
 
 class LoginForm(FlaskForm):
@@ -22,3 +22,19 @@ class EditEntryForm(FlaskForm):
     amount = DecimalField('Amount', render_kw={'placeholder':'Amount'})
     name = StringField('Restaurant Name', validators=[DataRequired()], render_kw={'placeholder':'Restaurant Name'})
     yelp_id = StringField('Yelp ID', render_kw={'placeholder':'Yelp ID'})
+    
+class CalendarMonthYearForm(FlaskForm):
+    choices = [(1, 'January'),
+               (2, 'February'),
+               (3, 'March'),
+               (4, 'April'),
+               (5, 'May'),
+               (6, 'June'),
+               (7, 'July'),
+               (8, 'August'),
+               (9, 'September'),
+               (10, 'October'),
+               (11, 'November'),
+               (12, 'December')]
+    month = SelectField('Month', coerce=int, choices = choices )
+    year = IntegerField('Year')

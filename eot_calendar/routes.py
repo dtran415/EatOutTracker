@@ -2,29 +2,43 @@ from flask import Blueprint, render_template, request, abort, redirect, url_for
 from models import db, Entry
 from flask_login import login_required, current_user
 from eot_calendar.helpers import generateCalendarHTML, get_restaurant, fetch_restaurant_from_yelp, search_yelp, get_star_ratings_html
-from forms import AddEntryForm, EditEntryForm
-from datetime import datetime
+from forms import AddEntryForm, EditEntryForm, CalendarMonthYearForm
+from datetime import datetime, date
+import calendar
+from sqlalchemy.sql import func
 
-calendar = Blueprint('calendar', __name__)
+eot_calendar = Blueprint('calendar', __name__)
 
-@calendar.route('/calendar')
+@eot_calendar.route('/calendar')
 @login_required
 def calendar_page():
-    year = request.args.get('year')
-    month = request.args.get('month')
+    year = int(request.args.get('year'))
+    month = int(request.args.get('month'))
+    today = datetime.now().date()
+    if not year and not month:
+        year = today.year
+        month = today.month    
     
-    calendarHTML = None
-    if year and month:
-        calendarHTML = generateCalendarHTML(db, current_user.id, year, month)
-    else:
-        calendarHTML = generateCalendarHTML(db, current_user.id)
+    form = CalendarMonthYearForm(month=month, year=year)
+    
+    range = calendar.monthrange(year, month)
+    startdate = date(year, month, range[0])
+    enddate = date(year, month, range[1])
+    
+    # get number of restaurants visited by a specific user in date range
+    numPlaces = db.session.query(Entry).filter(Entry.user_id==current_user.id, Entry.date.between(startdate, enddate)).distinct(Entry.restaurant_id).count()
+    
+    # get total spent for user for month
+    totalSpent = db.session.query(func.sum(Entry.amount)).filter(Entry.user_id==current_user.id, Entry.date.between(startdate, enddate)).first()[0]
+    
+    calendarHTML = generateCalendarHTML(db, current_user.id, year, month)
         
     if not calendarHTML:
         abort(400)
         
-    return render_template('calendar.html', calendarHTML=calendarHTML, current_user=current_user)
+    return render_template('calendar.html', calendarHTML=calendarHTML, current_user=current_user, form=form, numPlaces=numPlaces, totalSpent=totalSpent)
 
-@calendar.route('/entries')
+@eot_calendar.route('/entries')
 @login_required
 def add_entry_page():
     form = AddEntryForm()
@@ -35,7 +49,7 @@ def add_entry_page():
         
     return render_template('entry_add.html', current_user=current_user, form=form)
 
-@calendar.route('/entries', methods=['POST'])
+@eot_calendar.route('/entries', methods=['POST'])
 @login_required
 def add_entry():
     form = AddEntryForm()
@@ -57,7 +71,7 @@ def add_entry():
         
     return render_template('entry_add.html', current_user=current_user, form=form)
 
-@calendar.route('/entries/<int:entry_id>')
+@eot_calendar.route('/entries/<int:entry_id>')
 @login_required
 def show_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
@@ -77,7 +91,7 @@ def show_entry(entry_id):
     
     return render_template('entry_show.html', current_user=current_user, restaurant=restaurant, entry=entry, ratingsHTML=ratingsHTML)
 
-@calendar.route('/entries/<int:entry_id>/edit')
+@eot_calendar.route('/entries/<int:entry_id>/edit')
 @login_required
 def edit_entry_page(entry_id):
     entry = Entry.query.get_or_404(entry_id)
@@ -90,7 +104,7 @@ def edit_entry_page(entry_id):
     form.yelp_id.data = entry.restaurant.yelp_id
     return render_template('entry_edit.html', current_user=current_user, form=form, entry_id=entry.id)
 
-@calendar.route('/entries/<int:entry_id>', methods=['POST'])
+@eot_calendar.route('/entries/<int:entry_id>', methods=['POST'])
 @login_required
 def edit_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
@@ -116,7 +130,7 @@ def edit_entry(entry_id):
         
     return render_template('entry_edit.html', current_user=current_user, form=form, entry_id=entry.id)
 
-@calendar.route('/entries/<int:entry_id>/delete', methods=['POST'])
+@eot_calendar.route('/entries/<int:entry_id>/delete', methods=['POST'])
 @login_required
 def delete_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
@@ -128,7 +142,7 @@ def delete_entry(entry_id):
     
     return redirect(url_for('calendar.calendar_page'))
 
-@calendar.route('/yelp-search')
+@eot_calendar.route('/yelp-search')
 def search_yelp_request():
     term = request.args.get('term')
     location = request.args.get('location')

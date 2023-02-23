@@ -24,7 +24,7 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
     nextMonth = end
     entries = get_entries_for_user(db, user_id, start, end)
     
-    html = f"""<div class="container text-center">
+    html = f"""<div class="content pl-1 text-center">
 	<h1><a class='float-start text-decoration-none text-dark' href='?year={previousMonth.year}&month={previousMonth.month}'>&lt;</a>{calendar.month_name[start.month]} {start.year}<a class='float-end text-decoration-none text-dark' href='?year={nextMonth.year}&month={nextMonth.month}'>&gt;</a></h1>
 	<div class="grid-calendar">
 		<div class="row calendar-week-header">

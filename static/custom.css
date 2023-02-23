@@ -49,3 +49,11 @@ td {
 .entry-form {
   max-width: 480px;
 }
+
+.sidebar {
+  width: 250px;
+}
+
+.calendar-view {
+  width: 100%;
+}
