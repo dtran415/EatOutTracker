@@ -42,28 +42,32 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
         for j in range(0,7):
             # start adding date info when the first day of the week is found
             if not found:
-                if (start.weekday() + 6) % 7 == j:
+                if (j + 6) % 7 == start.weekday():
                     found = True
-            dayNumber = ''
                 
             html += f'<div class="col grid-cell border">'
             # start adding stuff when a day of the month is found
             if found:
                 # only add day if within that month. Not adding days from previous and next month
                 if start < end:
-                    dayNumber = start.day
-                    html += f"<div class='text-start'>{dayNumber} <a class='btn btn-success btn-sm float-end py-0 px-1' href='{url_for('calendar.add_entry_page', date=start.strftime('%Y-%m-%d'))}'>+</a></div>"
                     entries_list = entries.get(start, [])
-                    for entry in entries_list:
-                        html += f'<a href="{url_for("calendar.show_entry", entry_id=entry.id)}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br>'
-                        if entry.amount:
-                            html += f'<span class="badge bg-success">${round(entry.amount, 2):.2f}</span>'
-                        html += '</a>'
+                    html += get_day_html(start, entries_list)
                     
                 start = start + datetime.timedelta(days=1)
             html += "</div>"
         html += '</div>'
     html += '</div>'
+    return html
+
+def get_day_html(day, entries_list):
+    dayNumber = day.day
+    html = f"<div class='text-start'>{dayNumber} <a class='btn btn-outline-success btn-sm float-end py-0 px-1' href='{url_for('calendar.add_entry_page', date=day.strftime('%Y-%m-%d'))}'>+</a></div>"
+    for entry in entries_list:
+        html += f'<a href="{url_for("calendar.show_entry", entry_id=entry.id)}" class="btn btn-warning btn-sm d-block my-1">{entry.restaurant.name}<br>'
+        if entry.amount:
+            html += f'<span class="badge bg-success">${round(entry.amount, 2):.2f}</span>'
+        html += '</a>'
+                        
     return html
 
 # returns dict for easy reference when adding to calendar

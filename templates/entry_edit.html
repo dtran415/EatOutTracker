@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 entry-form border rounded shadow-sm">
     <h1>Edit Entry</h1>
     <form action="{{url_for('calendar.edit_entry', entry_id=entry_id)}}" method="POST">
         <div class="form-group">

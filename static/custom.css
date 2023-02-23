@@ -45,3 +45,7 @@ td {
   min-height: 150px;
   padding:0.5em;
 }
+
+.entry-form {
+  max-width: 480px;
+}

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 border rounded shadow-sm">
     <div class="row">
-        <div class="col col-md-6">
+        <div class="col col-md-4">
             {% set missing_image = 'https://static.vecteezy.com/system/resources/previews/004/141/669/original/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg'%}
             <img src={{restaurant.get('img_url') or missing_image}} class='img-fluid'/>
         </div>
-        <div class="col col-md-6">
+        <div class="col col-md-8">
             {% if restaurant.get('url') %}
                 <a href='{{restaurant.get("url")}}' class="h1 d-inline text-decoration-none" target="_blank" rel="noopener noreferrer">{{restaurant.get('name')}}</a>
             {% else %}
