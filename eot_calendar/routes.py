@@ -12,17 +12,20 @@ eot_calendar = Blueprint('calendar', __name__)
 @eot_calendar.route('/calendar')
 @login_required
 def calendar_page():
-    year = int(request.args.get('year'))
-    month = int(request.args.get('month'))
+    year = request.args.get('year')
+    month = request.args.get('month')
     today = datetime.now().date()
     if not year and not month:
         year = today.year
-        month = today.month    
+        month = today.month
+        
+    year = int(year)
+    month = int(month)
     
     form = CalendarMonthYearForm(month=month, year=year)
     
     range = calendar.monthrange(year, month)
-    startdate = date(year, month, range[0])
+    startdate = date(year, month, 1)
     enddate = date(year, month, range[1])
     
     # get number of restaurants visited by a specific user in date range

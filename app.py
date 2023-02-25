@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for
 from eot_calendar.routes import eot_calendar
 from auth.routes import auth
+from eot_charts.routes import eot_charts
 from models import connect_db, db, User
 from flask_login import LoginManager, current_user
 
@@ -16,6 +17,7 @@ db.create_all()
 
 app.register_blueprint(auth)
 app.register_blueprint(eot_calendar)
+app.register_blueprint(eot_charts)
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login_page'

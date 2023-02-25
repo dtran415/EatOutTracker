@@ -38,3 +38,7 @@ class CalendarMonthYearForm(FlaskForm):
                (12, 'December')]
     month = SelectField('Month', coerce=int, choices = choices )
     year = IntegerField('Year')
+    
+class ChartsDateRangeForm(FlaskForm):
+    startdate = DateField('Date', validators=[DataRequired()])
+    enddate = DateField('Date', validators=[DataRequired()])

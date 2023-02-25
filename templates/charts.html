@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row calendar-view">
+    <div class="fixed sidebar p-4 bg-light vh-100">
+        <form action="" method="GET" id="daterange_form">        
+            <p>
+                {{form.startdate.label}}
+                {{form.startdate(class_="form-control")}}
+            </p>
+        
+            <p>
+                {{form.enddate.label}}
+                {{form.enddate(class_="form-control")}}
+            </p>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    </div>
+    <div class="col p-5">
+        <canvas id="visits" class="mb-5"></canvas>
+        <canvas id="spent" class="mb-5"></canvas>
+        <canvas id="dailyExpenditure" class="mb-5"></canvas>
+    </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
+  integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo="
+  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<script src="/static/eot_charts.js"></script>
+{% endblock %}
