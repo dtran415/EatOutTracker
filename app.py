@@ -4,13 +4,17 @@ from auth.routes import auth
 from eot_charts.routes import eot_charts
 from models import connect_db, db, User
 from flask_login import LoginManager, current_user
+from dotenv import load_dotenv
+import os
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///capstone1'
+app.config['SQLALCHEMY_DATABASE_URI'] = (os.environ.get('DATABASE_URL', 'postgresql:///capstone1'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = 'secretkey'
+
+load_dotenv()
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', default='secretkey')
 
 connect_db(app)
 db.create_all()

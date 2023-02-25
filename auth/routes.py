@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
-from forms import LoginForm, SignUpForm
+from forms import LoginForm, SignUpForm, ProfileUpdateForm
 from models import db, User
 from sqlalchemy.exc import IntegrityError
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required, current_user
 
 auth = Blueprint('auth', __name__)
 
@@ -23,7 +23,6 @@ def signup():
     if form.validate_on_submit():
         try:
             new_user = User.register(form.username.data, form.password.data)
-            db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=False)
             return redirect(url_for('calendar.calendar_page'))
@@ -53,3 +52,22 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('auth.login_page'))
+
+@auth.route('/profile')
+@login_required
+def profile_page():
+    form = ProfileUpdateForm(default_location=current_user.default_location)
+    return render_template('profile.html', user=current_user, form=form)
+
+@auth.route('/profile', methods=['POST'])
+@login_required
+def update_profile():
+    form = ProfileUpdateForm()
+    
+    if form.validate_on_submit():
+        current_user.default_location = form.default_location.data
+        db.session.commit()
+        flash('Profile Updated')
+        return redirect(url_for('auth.profile_page'))
+    
+    return render_template('profile.html', form=form)

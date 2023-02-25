@@ -42,3 +42,6 @@ class CalendarMonthYearForm(FlaskForm):
 class ChartsDateRangeForm(FlaskForm):
     startdate = DateField('Date', validators=[DataRequired()])
     enddate = DateField('Date', validators=[DataRequired()])
+    
+class ProfileUpdateForm(FlaskForm):
+    default_location = StringField('Default Location', validators=[Optional()])

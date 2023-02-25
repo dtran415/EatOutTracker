@@ -50,6 +50,10 @@ td {
   max-width: 480px;
 }
 
+.profile_form {
+  max-width: 480px;
+}
+
 .sidebar {
   width: 250px;
 }

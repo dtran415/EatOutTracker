@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
+    default_location = db.Column(db.Text)
     
     @classmethod
     def register(cls, username, password):
@@ -26,6 +27,7 @@ class User(UserMixin, db.Model):
         hashed_utf8 = hashed.decode("utf8")
         user = cls(username=username,
                    password=hashed_utf8)
+        db.session.add(user)
         return user
     
     @classmethod
@@ -56,19 +58,3 @@ class Entry(db.Model):
     amount = db.Column(db.Float)
     
     restaurant = db.relationship('Restaurant')
-    tags = db.relationship('Tag', secondary='tags_entries')
-    
-class Tag(db.Model):
-    __tablename__ = "tags"
-    
-    id = db.Column(db.Integer, primary_key=True)
-    tag_name = db.Column(db.Text, nullable=False)
-    
-class TagEntry(db.Model):
-    """Mapping of a playlist to a song."""
-
-    __tablename__ = "tags_entries"
-    
-    id = db.Column(db.Integer, primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
-    entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'), nullable=False)

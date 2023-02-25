@@ -43,6 +43,9 @@
                     {% endif %}
                     {% if current_user.is_authenticated%}
                     <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('auth.profile_page')}}">Profile</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-light" href="{{url_for('auth.logout')}}">Log Out</a>
                     </li>
                     {% endif %}
