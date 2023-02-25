@@ -30,7 +30,7 @@ def signup():
             db.session.rollback()
             form.username.errors.append('Username already taken')
             
-    return render_template('login.html', form=form)
+    return render_template('signup.html', form=form)
 
 @auth.route('/login', methods=['POST'])
 def login():

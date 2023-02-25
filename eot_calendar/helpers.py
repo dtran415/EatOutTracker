@@ -4,7 +4,7 @@ from models import Restaurant, Entry
 import requests
 from dotenv import load_dotenv
 import os
-from flask import jsonify, url_for
+from flask import url_for
 
 # return None if invalid year month
 def generateCalendarHTML(db, user_id, year=None, month=None):
@@ -22,7 +22,7 @@ def generateCalendarHTML(db, user_id, year=None, month=None):
     previousMonth = start - datetime.timedelta(days=1)
     # end is already next month
     nextMonth = end
-    entries = get_entries_for_user(db, user_id, start, end)
+    entries = get_entries_for_user(user_id, start, end)
     
     html = f"""<div class="content pl-1 text-center">
 	<h1><a class='float-start text-decoration-none text-dark' href='?year={previousMonth.year}&month={previousMonth.month}'>&lt;</a>{calendar.month_name[start.month]} {start.year}<a class='float-end text-decoration-none text-dark' href='?year={nextMonth.year}&month={nextMonth.month}'>&gt;</a></h1>
@@ -71,7 +71,7 @@ def get_day_html(day, entries_list):
     return html
 
 # returns dict for easy reference when adding to calendar
-def get_entries_for_user(db, user_id, startdate, enddate):
+def get_entries_for_user(user_id, startdate, enddate):
     entries = Entry.query.filter(Entry.user_id==user_id, Entry.date.between(startdate, enddate)).all()
     entries_dict = {}
     
@@ -82,13 +82,13 @@ def get_entries_for_user(db, user_id, startdate, enddate):
     
     return entries_dict
 
-def get_restaurant(db, name, yelp_id):
+def get_restaurant(db, name=None, yelp_id=None):
     restaurant = None
     # find restaurant by yelp_id
     if yelp_id:
         restaurant = Restaurant.query.filter_by(yelp_id=yelp_id).first()
         
-        if restaurant and name != restaurant.name:
+        if restaurant and name is not None and name != restaurant.name:
             # update the name in case it's different, for display purposes
             restaurant.name = name
             db.session.commit()
@@ -172,7 +172,7 @@ def search_yelp(term, location):
             "address":displayAddress
         })
     
-    return jsonify(results)
+    return results
 
 def get_star_ratings_html(rating):
     html = '<span>'

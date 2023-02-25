@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort, redirect, url_for
+from flask import Blueprint, render_template, request, abort, redirect, url_for, jsonify
 from models import db, Entry
 from flask_login import login_required, current_user
 from eot_calendar.helpers import generateCalendarHTML, get_restaurant, fetch_restaurant_from_yelp, search_yelp, get_star_ratings_html
@@ -154,7 +154,7 @@ def search_yelp_request():
         return ("Please supply term and location", 400)
     
     try:
-        return search_yelp(term, location)
+        return jsonify(search_yelp(term, location))
     except Exception as e:
         return (str(e), 500)
     
