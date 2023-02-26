@@ -4,17 +4,20 @@ from auth.routes import auth
 from eot_charts.routes import eot_charts
 from models import connect_db, db, User
 from flask_login import LoginManager, current_user
-from dotenv import load_dotenv
 import os
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = (os.environ.get('DATABASE_URL', 'postgresql:///capstone1'))
+database_uri = os.environ.get('DATABASE_URL', 'postgresql:///capstone1')
+# heroku uses postgres but support for that is removed on sqlalchemy so replace
+database_uri = database_uri.replace("postgres://", "postgresql://", 1)
+database_uri += "?sslmode=require"
+print(database_uri)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
-load_dotenv()
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', default='secretkey')
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', default='secretkey')
 
 connect_db(app)
 db.create_all()

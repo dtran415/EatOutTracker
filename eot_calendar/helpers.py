@@ -2,7 +2,6 @@ import datetime
 import calendar
 from models import Restaurant, Entry
 import requests
-from dotenv import load_dotenv
 import os
 from flask import url_for
 
@@ -121,8 +120,7 @@ def register_restaurant(db, name, yelp_id):
     return restaurant
         
 def fetch_restaurant_from_yelp(yelp_id):
-    load_dotenv()
-    YELP_API_KEY = os.getenv('YELP_API_KEY')
+    YELP_API_KEY = os.environ.get('YELP_API_KEY')
     
     if not YELP_API_KEY:
         raise Exception('Missing API Key')
@@ -144,8 +142,7 @@ def fetch_restaurant_from_yelp(yelp_id):
         raise Exception('Invalid Yelp ID')
     
 def search_yelp(term, location):
-    load_dotenv()
-    YELP_API_KEY = os.getenv('YELP_API_KEY')
+    YELP_API_KEY = os.environ.get('YELP_API_KEY')
     
     if not YELP_API_KEY:
         raise Exception('Missing API Key')
