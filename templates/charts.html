@@ -14,11 +14,16 @@
             </p>
             <button type="submit" class="btn btn-primary">Update</button>
         </form>
+        <br>
+        <div class="text-secondary">Places Visited</div>
+        <p class="h5" id="num-places">{{numPlaces or 0}}</p>
+        <div class="text-secondary">Total Spent</div>
+        <p class="h5" id="total-spent">${{'%0.2f'|format(totalSpent or 0)}}</p>
     </div>
     <div class="col p-5">
+        <canvas id="dailyExpenditure" class="mb-5"></canvas>
         <canvas id="visits" class="mb-5"></canvas>
         <canvas id="spent" class="mb-5"></canvas>
-        <canvas id="dailyExpenditure" class="mb-5"></canvas>
     </div>
 </div>
 <script

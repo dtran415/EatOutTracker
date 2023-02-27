@@ -26,10 +26,14 @@ def get_chart_data():
     rows = db.session.query(Restaurant.name, func.count(Restaurant.name), func.sum(Entry.amount)).join(Entry).filter(Entry.user_id == current_user.id, Entry.date.between(startdate, enddate)).group_by(Restaurant.name).all()
     results = {'visits':[], 'spent':[], 'daily':{}}
     
+    numPlaces = len(rows)
+    totalSpent = 0
+    
     for row in rows:
         restaurant = row[0]
         visits = row[1]
         spent = round(row[2], 2)
+        totalSpent += spent
         results['visits'].append({'restaurant':restaurant, 'visits':visits})
         results['spent'].append({'restaurant':restaurant, 'spent':spent})
         
@@ -40,6 +44,9 @@ def get_chart_data():
         day = row[0].strftime('%Y/%m/%d')
         amount = round(row[1], 2)
         results['daily'][day] = amount
+    
+    results['numPlaces'] = numPlaces
+    results['totalSpent'] = totalSpent
     
     return jsonify(results)
     

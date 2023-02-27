@@ -115,6 +115,7 @@ async function onClickUpdate(e) {
     return;
   }
 
+  updateSidebarData(response.data.numPlaces, response.data.totalSpent)
   updateVisitsChart(response.data.visits)
   updateSpentChart(response.data.spent)
   updateExpenditureChart(startdate, enddate, response.data.daily)
@@ -168,4 +169,9 @@ function updateExpenditureChart(startdate, enddate, data) {
     expenditureChart.data.datasets[0].data.push(amount)
   }
   expenditureChart.update()
+}
+
+function updateSidebarData(numPlaces, totalSpent) {
+  $('#num-places').text(numPlaces)
+  $('#total-spent').text(`\$${totalSpent.toFixed(2)}`)
 }
