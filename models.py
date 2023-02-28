@@ -8,8 +8,9 @@ bcrypt = Bcrypt()
 def connect_db(app):
     
     db.app = app
-    app.app_context().push()
-    db.init_app(app)
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
     
 class User(UserMixin, db.Model):
     

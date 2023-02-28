@@ -12,7 +12,6 @@ database_uri = os.environ.get('DATABASE_URL', 'postgresql:///capstone1')
 # heroku uses postgres but support for that is removed on sqlalchemy so replace
 database_uri = database_uri.replace("postgres://", "postgresql://", 1)
 database_uri += "?sslmode=require"
-print(database_uri)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
@@ -20,7 +19,6 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', default='secretkey')
 
 connect_db(app)
-db.create_all()
 
 app.register_blueprint(auth)
 app.register_blueprint(eot_calendar)
