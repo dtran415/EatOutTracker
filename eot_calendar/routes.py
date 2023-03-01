@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, abort, redirect, url_for, jsonify, session
 from models import db, Entry
 from flask_login import login_required, current_user
 from eot_calendar.helpers import generateCalendarHTML, get_restaurant, fetch_restaurant_from_yelp, search_yelp, get_star_ratings_html
@@ -14,13 +14,22 @@ eot_calendar = Blueprint('calendar', __name__)
 def calendar_page():
     year = request.args.get('year')
     month = request.args.get('month')
-    today = datetime.now().date()
     if not year and not month:
-        year = today.year
-        month = today.month
-        
+        # check session if there's month, year
+        if session.get('month') and session.get('year'):
+            month = session.get('month')
+            year = session.get('year')
+        else:
+            today = date.today()
+            year = today.year
+            month = today.month
+
     year = int(year)
     month = int(month)
+    
+    # keep track of last month and year used
+    session['month'] = month
+    session['year'] = year
     
     form = CalendarMonthYearForm(month=month, year=year)
     
@@ -68,6 +77,11 @@ def add_entry():
             new_entry = Entry(date=date, amount=amount, restaurant_id=restaurant.id, user_id=current_user.id)
             db.session.add(new_entry)
             db.session.commit()
+            
+            # keep track of last month and year used
+            session['month'] = date.month
+            session['year'] = date.year
+            
             return redirect(url_for('calendar.show_entry', entry_id=new_entry.id))
         except Exception as e:
             form.yelp_id.errors.append(str(e))        
@@ -127,6 +141,11 @@ def edit_entry(entry_id):
             restaurant = get_restaurant(db, entry.name, entry.yelp_id)
             entry.restaurant_id = restaurant.id
             db.session.commit()
+            
+            # keep track of last month and year used
+            session['month'] = date.month
+            session['year'] = date.year
+            
             return redirect(url_for('calendar.show_entry', entry_id=entry.id))
         except Exception as e:
             form.yelp_id.errors.append(str(e))

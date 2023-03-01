@@ -2,6 +2,7 @@ $(function() {
     $('#search-yelp').on('click', searchYelp)
     $('#results').on('click', '.result', selectBusiness)
     $('#delete-btn').on('submit', deleteEntry)
+    $('.yelp-param').on('keypress', onYelpParamEnter)
 });
 
 function deleteEntry(e) {
@@ -20,7 +21,15 @@ function selectBusiness(e) {
     $('#name').val(yelp_name)
 }
 
+function onYelpParamEnter(e) {
+    if (e.which == '13') {
+        e.preventDefault()
+        searchYelp(e)
+    }
+}
+
 async function searchYelp(e) {
+    e.preventDefault()
     $('#results').empty()
     $('#search-yelp-modal').modal('show')
     let response = null;

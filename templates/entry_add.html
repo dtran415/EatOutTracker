@@ -18,12 +18,12 @@
         
             <p>
                 {{form.name.label}}
-                {{form.name(class_="form-control")}}
+                {{form.name(class_="form-control yelp-param")}}
             </p>
 
             <p>
                 <label for="location">Location (Used for Yelp Search)</label>
-                <input class="form-control" id="location" placeholder="ie. San Francisco" value={{current_user.default_location}}>
+                <input class="form-control yelp-param" id="location" placeholder="ie. San Francisco" value={{current_user.default_location}}>
                 <button type='button' class='btn btn-sm btn-danger my-2' id="search-yelp">Search Yelp</button>
             </p>
         

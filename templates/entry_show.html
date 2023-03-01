@@ -10,9 +10,9 @@
             {% if restaurant.get('url') %}
                 <a href='{{restaurant.get("url")}}' class="h1 d-inline text-decoration-none" target="_blank" rel="noopener noreferrer">{{restaurant.get('name')}}</a>
             {% else %}
-                <div class="h1 d-inline">{{restaurant.get('name')}}</div>
+                <div class="h1 d-inline mb-1">{{restaurant.get('name')}}</div>
             {% endif %}
-            {% if ratingsHTML %}<span class="text-danger mb-1">{{ratingsHTML|safe}}</span><span class="mb-1"> {{restaurant.get('review_count', 0)}} reviews</span>{% endif %}</h1>
+            {% if ratingsHTML %}<div class="d-block mb-2"><span class="text-danger mb-1">{{ratingsHTML|safe}}</span><span class="mb-1"> {{restaurant.get('review_count', 0)}} reviews</span></div>{% endif %}
             <div class="mb-2"><a class="btn btn-primary" href="{{url_for('calendar.edit_entry_page', entry_id=entry.id)}}">Edit</a>
                 <form class="d-inline" method="POST" action="{{url_for('calendar.delete_entry', entry_id=entry.id)}}" id="delete-btn">
                     <button class="btn btn-danger" type="submit">Delete</button>
