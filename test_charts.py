@@ -20,8 +20,7 @@ class ChartTestCases(TestCase):
         
     def setUp(self) -> None:
         self.client = app.test_client()
-        self.app_context = app.test_request_context()
-        self.app_context.push()
+        app.test_request_context().push()
 
         db.drop_all()
         db.create_all()
@@ -38,7 +37,6 @@ class ChartTestCases(TestCase):
         db.session.rollback()
         db.session.remove()
         logout_user()
-        self.app_context.pop()
         
     def test_chart_page_loads_properly(self):
         with self.client as c:
@@ -60,7 +58,7 @@ class ChartTestCases(TestCase):
         db.session.commit()
         
         with self.client as c:
-            resp = c.get("/charts/data")
+            resp = c.get("/charts/data?startdate=2023-02-01&enddate=2023-03-01")
             resp_json = resp.json
             
             self.assertIsNotNone(resp_json.get('daily'))

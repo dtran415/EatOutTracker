@@ -6,7 +6,7 @@ import os
 from flask import url_for
 
 # return None if invalid year month
-def generateCalendarHTML(db, user_id, year=None, month=None):
+def generateCalendarHTML(user_id, year=None, month=None):
     start = None
     try:
         if year != None and month != None:

@@ -43,7 +43,7 @@ def calendar_page():
     # get total spent for user for month
     totalSpent = db.session.query(func.sum(Entry.amount)).filter(Entry.user_id==current_user.id, Entry.date.between(startdate, enddate)).first()[0]
     
-    calendarHTML = generateCalendarHTML(db, current_user.id, year, month)
+    calendarHTML = generateCalendarHTML(current_user.id, year, month)
         
     if not calendarHTML:
         abort(400)
@@ -143,8 +143,8 @@ def edit_entry(entry_id):
             db.session.commit()
             
             # keep track of last month and year used
-            session['month'] = date.month
-            session['year'] = date.year
+            session['month'] = entry.date.month
+            session['year'] = entry.date.year
             
             return redirect(url_for('calendar.show_entry', entry_id=entry.id))
         except Exception as e:

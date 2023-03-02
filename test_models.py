@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_ECHO'] = False
 class UserModelTestCase(TestCase):
     
     def setUp(self) -> None:
+        app.app_context().push()
         db.drop_all()
         db.create_all()
         return super().setUp()
@@ -22,7 +23,6 @@ class UserModelTestCase(TestCase):
         
     def test_register_user_with_good_input(self):
         User.register("user1", "password1")
-        db.session.commit()
         user = User.query.filter(User.username=="user1").first()
         self.assertIsNotNone(user)
         

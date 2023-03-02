@@ -20,9 +20,8 @@ class AuthTestCase(TestCase):
         
     def setUp(self) -> None:
         self.client = app.test_client()
-        self.app_context = app.test_request_context()
-        self.app_context.push()
-
+        app.test_request_context().push()
+        
         db.drop_all()
         db.create_all()
         return super().setUp()
@@ -30,7 +29,6 @@ class AuthTestCase(TestCase):
     def tearDown(self) -> None:
         db.session.rollback()
         db.session.remove()
-        self.app_context.pop()
         
     def test_login_page_loads(self):
         

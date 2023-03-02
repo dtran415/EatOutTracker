@@ -24,8 +24,7 @@ class CalendarTestCases(TestCase):
         
     def setUp(self) -> None:
         self.client = app.test_client()
-        self.app_context = app.test_request_context()
-        self.app_context.push()
+        app.test_request_context().push()
 
         db.drop_all()
         db.create_all()
@@ -39,7 +38,6 @@ class CalendarTestCases(TestCase):
         db.session.rollback()
         db.session.remove()
         logout_user()
-        self.app_context.pop()
         
     def test_new_user_gets_empty_calendar(self):
         with self.client as c:
@@ -274,7 +272,7 @@ class CalendarHelperTestCases(TestCase):
         
     def test_register_restaurant(self):
         r = register_restaurant(db, 'McD', self.test_yelp_id)
-        r2 = Restaurant.query.get(r.id)
+        r2 = db.session.get(Restaurant, r.id)
         self.assertIsNotNone(r2)
         
     def test_register_restaurant_with_bad_yelp_id(self):
