@@ -32,19 +32,6 @@
   border-radius: 0;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th, td {
-  border: 1px solid;
-}
-
-td {
-  height: 200px;
-}
-
 .calendar-week .grid-cell {
   min-height: 150px;
   padding:0.5em;

@@ -95,6 +95,9 @@ def show_entry(entry_id):
     restaurant = {'name':entry.restaurant.name}
     ratingsHTML = None
     
+    recent_entries = db.session.query(Entry).filter(Entry.user_id==current_user.id, Entry.restaurant_id==entry.restaurant_id).order_by(Entry.date.desc()).limit(5).all()
+    
+    
     yelp_id = entry.restaurant.yelp_id
     if yelp_id:
         response = fetch_restaurant_from_yelp(entry.restaurant.yelp_id)
@@ -106,7 +109,7 @@ def show_entry(entry_id):
         restaurant['url'] = response.get('url')
         ratingsHTML = get_star_ratings_html(restaurant['ratings'])
     
-    return render_template('entry_show.html', current_user=current_user, restaurant=restaurant, entry=entry, ratingsHTML=ratingsHTML)
+    return render_template('entry_show.html', current_user=current_user, restaurant=restaurant, entry=entry, ratingsHTML=ratingsHTML, recent_entries=recent_entries)
 
 @eot_calendar.route('/entries/<int:entry_id>/edit')
 @login_required

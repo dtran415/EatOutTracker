@@ -34,6 +34,19 @@
             <div class="text-secondary">Amount</div>
             <p class="h5">${{'%0.2f'|format(entry.amount)}}</p>
             {% endif %}
+            <table class="table table-light table-striped border mt-4">
+                <thead>
+                    <tr><td class="table-light" colspan="2"><h5>Recent Visits</h5></td></tr>
+                </thead>
+                <tbody>
+                {% for entry in recent_entries %}
+                    <tr >
+                        <td>{{entry.date.strftime("%B %d, %Y")}}</td>
+                        <td>${{"%.2f"|format(entry.amount)}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
