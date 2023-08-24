@@ -58,6 +58,8 @@ def add_entry_page():
     # if supplying a date prepopulate date
     if request.args.get('date'):
         form.date.data = datetime.strptime(request.args.get('date'), '%Y-%m-%d').date()
+    else:
+        form.date.data = date.today()
         
     return render_template('entry_add.html', current_user=current_user, form=form)
 

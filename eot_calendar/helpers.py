@@ -36,7 +36,7 @@ def generateCalendarHTML(user_id, year=None, month=None):
 			<div class="col grid-cell border"><div><div><span>Saturday</span></div></div></div>
 		</div>"""
     found = False
-    for i in range(0, 5):       
+    while start < end:
         html += '<div class="row calendar-week">'
         for j in range(0,7):
             # start adding date info when the first day of the week is found
